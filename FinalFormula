@@ -1,0 +1,21 @@
+origcoef = float(input())
+trynum = int(input())           #from the last passed test considering this one
+frequency =  int(input())       #per hour
+totaldecency = 0.5              #started decency for everyone
+if origcoef <= 0.5:
+    totaldecency = totaldecency - (((origcoef*10*frequency)/trynum)/100)
+else:
+    totaldecency = totaldecency + (((origcoef*trynum)/frequency)/100)
+#/////////////////////////////////////////////////////////////////////
+if totaldecency >= 0 and totaldecency < 0.25:
+    print("Списал")
+else:
+    if totaldecency >= 0.25 and totaldecency < 0.50:
+        print ("Скорее всего списал")
+    else:
+        if totaldecency >= 0.50 and totaldecency < 0.75:
+            print("Скорее всего не списал")
+        else:
+            print("Не списал")
+#///////////////////////////////////////////////////////////////////////
+print(totaldecency)
