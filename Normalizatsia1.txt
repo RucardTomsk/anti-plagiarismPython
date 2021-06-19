@@ -1,0 +1,35 @@
+#include <iostream>
+#include <string>
+#include <regex>
+#include <algorithm>
+#include <cctype>
+using namespace std;
+//в осознании алгоритма transform помогла Зятикова Надежда
+char titleToLower(char simbol)
+{
+	if (simbol >= 'A' && simbol <= 'Z')
+	{
+		simbol += 32;
+	}
+	return simbol;
+}
+
+int main()
+{
+	string str;
+	regex reg("[a-zA-Z0-9\\s]");
+	smatch  match;
+
+	while (getline(cin, str))
+	{
+		transform(str.begin(), str.end(), str.begin(), titleToLower);
+		while (regex_search(str, match,reg))
+		{
+			if (match.size() > 0)
+			{
+				cout << match[0];
+			}
+			str = match.suffix();
+		}
+	}
+}

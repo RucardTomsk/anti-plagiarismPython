@@ -1,0 +1,116 @@
+#include <iostream>
+#include <cmath>
+using namespace std;
+struct top
+{
+    long long int val;
+    top* left = NULL;
+    top* right = NULL;
+    top* next = NULL;
+};
+struct tree
+{
+    top* begin = NULL;
+    top* end = NULL;
+    top* index = NULL;
+
+    void insert(long long int a);
+    void printInstruction(string a);
+};
+
+void tree::insert(long long int a)
+{
+    top* b = new top;
+    if (end == NULL)
+    {
+        begin = b;
+        begin->val = a;
+        end = begin;
+        index = begin;
+
+    }
+    else
+    {
+        end->next = b;
+        if (index->left == NULL)
+        {
+            index->left = b;
+        }
+        else
+        {
+            index->right = b;
+            index = index->next;
+        }
+        end = end->next;
+        end->val = a;
+    }
+}
+void tree::printInstruction(string a)
+{
+    if (index->val != -1)
+    {
+        cout << index->val << endl;
+    }
+    else
+    {
+        cout << "empty" << endl;
+    }
+    if (a == "right")
+    {
+        index = index->right;
+    }
+    else
+    {
+        index = index->left;
+    }
+}
+
+int main() {
+
+    long long int i = 0, m, n, value, quantity = 0;
+    tree* tree1 = new tree;
+    string Instruction;
+
+    cin >> n;
+    while (i < n)
+    {
+        cin >> value;
+        tree1->insert(value);
+        i++;
+    }
+
+    cin >> m;
+    i = 0;
+    tree1->index = tree1->begin;
+    while (i < m)
+    {
+        cin >> Instruction;
+        if (tree1->index != NULL)
+        {
+            tree1->printInstruction(Instruction);
+        }
+        else
+        {
+            cout << "empty" << endl;
+            i++;
+            break;
+        }
+        i++;
+    }
+    while (i < m)
+    {
+        cin >> Instruction;
+        cout << "empty" << endl;
+        i++;
+    }
+    if (tree1->index == NULL || tree1->index->val == -1)
+    {
+        cout << "empty" << endl;
+    }
+    else
+    {
+        cout << tree1->index->val << endl;
+    }
+
+    return 0;
+}

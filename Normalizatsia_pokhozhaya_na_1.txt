@@ -1,0 +1,40 @@
+#include <iostream>
+#include <regex>
+#include <string>
+#include <algorithm>
+#include <cctype>
+
+using namespace std;
+
+char registerToLower(char simbol)
+{
+	{
+		if (simbol <= 'Z' && simbol >= 'A')
+		{
+			simbol += 32;
+		}
+	}
+
+	return simbol;
+}
+
+int main()
+{
+	string str;
+	regex time("[a-zA-Z0-9\\s]");
+	smatch match;
+
+	while (getline(cin, str))
+	{
+	    transform(str.begin(), str.end(), str.begin(), registerToLower);
+
+		while (regex_search(str, match, time))
+		{
+			if (match.size() > 0)
+			{
+				cout << match[0];
+			}
+			str = match.suffix();
+		}
+	}
+}

@@ -1,0 +1,167 @@
+#define _CRT_SECURE_NO_WARNINGS
+#include <iostream>
+#include <cmath>
+using namespace std;
+
+class Tree
+{
+	class Elem
+	{
+	public:
+		int value;
+		Elem* left = nullptr, * right = nullptr, * next = nullptr, * prev = nullptr;
+	};
+	Elem* pbeg = nullptr, * pend = nullptr;
+public:
+	int len = 0;
+	void PushBack(int val)
+	{
+		Elem* ptr = new Elem;
+		ptr->value = val;
+		if (!pbeg)
+		{
+			pbeg = ptr;
+			pend = pbeg;
+		}
+		else
+		{
+			pend->next = ptr;
+			ptr->prev = pend;
+			pend = ptr;
+		}
+		len++;
+	}
+
+	Elem* Get(int num)
+	{
+		Elem* ptr = new Elem;
+		ptr = pbeg;
+		while (num)
+		{
+			ptr = ptr->next;
+			num--;
+		}
+		return ptr;
+	}
+
+	void GetContact()
+	{
+		Elem* ptr = new Elem;
+		Elem* ptr0 = new Elem;
+		ptr = pbeg;
+		int x = len / 2 - 1;
+		while (x)
+		{
+			ptr = ptr->next;
+			x--;
+		}
+		for (int i = len / 2 - 1; i >= 0; i--)
+		{
+			ptr0 = ptr;
+			if (2 * i + 2 < len)
+			{
+				x = i + 2;
+				while (x)
+				{
+					ptr0 = ptr0->next;
+					x--;
+				}
+				ptr->right = ptr0;
+				ptr->left = ptr0->prev;
+			}
+			else if (2 * i + 1 < len)
+			{
+				x = i + 1;
+				while (x)
+				{
+					ptr0 = ptr0->next;
+					x--;
+				}
+				ptr->left = ptr0;
+			}
+			ptr = ptr->prev;
+		}
+	}
+
+	void PrintTree(int amount, string* com)
+	{
+		Elem* ptr = new Elem;
+		ptr = pbeg;
+		
+	    if (Get(0)->value != -1)
+	    {
+		    cout << Get(0)->value << " ";
+	    }
+    	else
+	    {
+	    	cout << "empty" << " ";
+    	}
+	
+		for (int i = 0; i < amount; i++)
+		{
+			if (com[i] == "left")
+			{
+				if (ptr != nullptr)
+				{
+					ptr = ptr->left;
+				}
+
+				if (ptr != nullptr && ptr->value != -1)
+				{
+					cout << ptr->value << " ";
+				}
+				else
+				{
+					cout << "empty" << " ";
+				}
+			}
+			else
+			{
+				if (ptr != nullptr)
+				{
+					ptr = ptr->right;
+				}
+				if (ptr != nullptr && ptr->value != -1)
+				{
+					cout << ptr->value << " ";
+				}
+				else
+				{
+					cout << "empty" << " ";
+				}
+			}
+		}
+	}
+
+};
+
+int main()
+{
+	//freopen("input.txt", "r", stdin);
+	//freopen("output.txt", "w", stdout);
+
+	Tree Bin;
+	int size, amount, x;
+
+	cin >> size;
+
+	for (int i = 0; i < size; i++)
+	{
+		cin >> x;
+		Bin.PushBack(x);
+	}
+
+	Bin.GetContact();
+
+	cin >> amount;
+	string* com = new string[amount];
+	for (int i = 0; i < amount; i++)
+	{
+		cin >> com[i];
+	}
+
+
+
+	Bin.PrintTree(amount, com);
+	cout << endl;
+}

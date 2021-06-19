@@ -1,0 +1,9 @@
+515 Valera Prokhod_po_derevu1.txt 18.06.2021;13:22 14
+123 Vadim Prokhod_po_derevu2.txt 16.05.2021;11:22 25
+115 Vlad Prokhod_po_derevu_pokhozhiy_na_1.txt 10.06.2021;10:10 5
+262 Valera Normalizatsia1.txt 18.06.2021;13:22 14
+233 Vadim Normalizatsia2.txt 16.05.2021;11:22 25
+251 Vlad Normalizatsia_pokhozhaya_na_1.txt 10.06.2021;10:10 5
+325 Valera Proverka1.txt 18.06.2021;13:22 14
+335 Vadim Proverka2.txt 16.05.2021;11:22 25
+325 Vlad Proverka_pokhozhaya_na_1.txt 10.06.2021;10:10 5
