@@ -1,0 +1,130 @@
+#include <iostream>
+#include <cmath>
+#include <ctime>
+#include <iomanip>
+#include <climits>
+using namespace std;
+int n; double **pheromones, **w;
+const int alpha = 1, beta = 3, rho = 0.5, iters = 100, pherom_const = 1, num_ants = 20;
+
+struct ant {
+	int way[50];
+	double way_length;
+	bool visited[50];
+	int cur, startpoint;
+};
+
+ant ants[num_ants], best;
+
+void init_ants() {
+	int i, j, startpoint;
+	for (i = 0; i < num_ants; i++) {
+		startpoint = rand() % n;
+		ants[i].way[0] = startpoint;
+		ants[i].way_length = 0;
+		for (j = 0; j < 50; j++) ants[i].visited[j] = false;
+		ants[i].visited[startpoint] = true;
+		ants[i].cur = startpoint;
+		ants[i].startpoint = startpoint;
+	}
+}
+
+void go(int num, int step) {
+	double sum = 0, p = 0, r = (double)rand() / RAND_MAX - 0.001; int i, to;
+	for (i = 0; i < n; i++) {
+		if (!ants[num].visited[i]) {
+			sum += pow(pheromones[ants[num].cur][i], alpha) * pow((double)1/w[ants[num].cur][i], beta);
+		}
+	}
+	for (to = 0; to < n; to++) {
+		if (!ants[num].visited[to]) {
+			p += (double)(pow(pheromones[ants[num].cur][to], alpha) * pow((double)1/w[ants[num].cur][to], beta)) / sum;
+			if (r < p) break;
+		}
+	}
+	ants[num].visited[to] = true;
+	ants[num].way[step + 1] = to;
+	ants[num].way_length += w[ants[num].cur][to];
+	ants[num].cur = to;
+}
+
+bool ants_move(int step) {
+	bool moved = false; int i;
+	for (i = 0; i < num_ants; i++) {
+		if (step < n - 1) {
+			go(i, step);
+			moved = true;
+		}
+		if (step == n - 1) {
+			ants[i].way_length += w[ants[i].cur][ants[i].startpoint];
+			ants[i].cur = ants[i].startpoint;
+		}
+	}
+	return moved;
+}
+
+void ev_pher() {
+	int i, j;
+	for (i = 0; i < n; i++) {
+		for (j = 0; j < n; j++) {
+			pheromones[i][j] *= (1 - rho);
+			if (pheromones[i][j] < (double)1 / (double)n) {
+				pheromones[i][j] = (double)1 / (double)n;
+			}
+		}
+	}
+}
+
+void upd_pher() {
+	int i, j, from, to;
+	for (i = 0; i < num_ants; i++) {
+		for (j = 0; j < n; j++) {
+			from = ants[i].way[j];
+			to = ants[i].way[(j + 1) % n];
+			pheromones[from][to] += (double)pherom_const / (double)ants[i].way_length;
+		}
+	}
+}
+
+void is_new_best() {
+	int i;
+	for (i = 0; i < num_ants; i++) {
+		if (ants[i].way_length < best.way_length)
+			best = ants[i];
+	}
+}
+
+int main() {
+	freopen("input.txt", "r", stdin);
+	freopen("output.txt", "w", stdout);
+	srand(time(0));
+	cout << setprecision(8);
+	int i, j;
+	cin >> n;
+	int* x = new int[n]; int* y = new int[n];
+	for (i = 0; i < n; i++) cin >> x[i] >> y[i];
+	pheromones = new double*[n];
+	w = new double*[n];
+	best.way_length = INT_MAX;
+	for (i = 0; i < n; i++) {
+		w[i] = new double[n];
+		pheromones[i] = new double[n];
+		for (j = 0; j < n; j++) {
+			w[i][j] = sqrt(pow((x[i] - x[j]), 2) + pow((y[i] - y[j]), 2));
+			pheromones[i][j] = (double)1 / (double)n;
+		}
+	}
+	for (i = 0; i < iters; i++) {
+		init_ants();
+		for (j = 0; j < n; j++) {
+			if (!ants_move(j)) {
+				ev_pher();
+				upd_pher();
+				is_new_best();
+			}
+		}
+	}
+	cout << best.way_length << endl;
+	for (i = 0; i < n; i++) cout << best.way[i]+1 << " ";
+	return 0;
+}

@@ -22,7 +22,7 @@ def main():
 
 	lab1 = [mas[0].split(" "),mas[1].split(" "),mas[2].split(" ")]
 	lab2 = [mas[3].split(" "),mas[4].split(" "),mas[5].split(" ")]
-	lab3 = [mas[6].split(" "),mas[7].split(" "),mas[8].split(" ")]
+	lab3 = [mas[6].split(" "),mas[7].split(" "),mas[8].split(" "),mas[9].split(" ")]
 
 	all_mas = [lab1,lab2,lab3]
 
@@ -43,6 +43,7 @@ def main():
 	#decency.get_decency(mas[0].split(" ")[3],mas[1].split(" ")[4])
 	mas_d = []
 	mas_i = []
+	mas_l = []
 	s_o = 0
 	counter = 0
 
@@ -50,12 +51,13 @@ def main():
 		if i[0] == id_student:
 			continue
 		else:
-			shin = shingles.get_shingles(fail_name,i[2])
+			shin,log_mas = shingles.get_shingles(fail_name,i[2])
 			if shin <= 0.6:
 				mas_d.append(i[1])
 				mas_i.append(i[2])
-				s_o += shin
-				counter += 1
+				mas_l.append(log_mas)
+			s_o += shin
+			counter += 1
 	if counter != 0:
 			s_o /= counter
 
@@ -72,7 +74,7 @@ def main():
 	if counter != 0:
 			s_d /= counter
 
-	print(final_app.finel(s_o,int(k),s_d,mas_d,mas_i))
+	final_app.finel(s_o,int(k),s_d,mas_d,mas_i,mas_l)
 
 if __name__ == '__main__':
 	main()

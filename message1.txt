@@ -1,0 +1,166 @@
+#include <iostream>
+#include<math.h>
+#include<vector>
+#include<climits>
+#include <queue> 
+#include<string>
+#include <iomanip> 
+#include <algorithm>
+#include <random>  
+using namespace std;
+double **w;
+int n;
+double **pher;
+const int num_ants = 20, alpha = 1, beta = 3, rho = 0.5, iters = 100, pherom_const = 1;
+
+struct ant
+{
+	bool visited[50];
+	int cur, start;
+	double way_length;
+	int way[50];
+};
+ant anst[num_ants], best;
+
+void init_anst()
+{
+	int cur_pos;
+	for (int i = 0; i < num_ants; i++)
+	{
+		cur_pos = rand() % n;
+		anst[i].way[0] = cur_pos;
+		anst[i].way_length = 0;
+		for (int j = 0; j < 50; j++)
+		{
+			anst[i].visited[j] = false;
+			anst[i].visited[cur_pos] = true;
+			anst[i].cur = cur_pos;
+			anst[i].start = cur_pos;
+		}
+	}
+}
+void go(int num,int step)
+{
+	double sum = 0, p = 0, r = (double)rand() / RAND_MAX-0.001;
+	int j;
+	for (int i = 0; i < n; i++)
+	{
+		if (!anst[num].visited[i])
+		{
+			sum += pow(pher[anst[num].cur][i], alpha) *  pow((double)1/w[anst[num].cur][i], beta);
+		}
+	}
+	for ( j = 0; j < n; j++)
+	{
+		if (!anst[num].visited[j])
+		{
+			p += (double)(pow(pher[anst[num].cur][j], alpha))*pow((double)1 / w[anst[num].cur][j], beta) / sum;
+			if (r < p)
+				break;
+		}
+	}
+	anst[num].visited[j] = true;
+	anst[num].way[step + 1] = j;
+	anst[num].way_length += w[anst[num].cur][j];
+	anst[num].cur = j;
+}
+
+bool ants_move(int step)
+{
+	bool moved = false;
+	for (int i = 0; i < num_ants; i++)
+	{
+		if (step < n-1)
+		{
+			go(i,step);
+			moved = true;
+		}
+		if (step == n - 1)
+		{
+			anst[i].way_length += w[anst[i].cur][anst[i].start];
+			anst[i].cur = anst[i].start;
+		}
+	}
+	return moved;
+}
+void ev_pher()
+{
+	for (int i = 0; i < n; i++)
+	{
+		for (int j = 0; j < n; j++)
+		{
+			pher[i][j] *= (1 - rho);
+			if (pher[i][j] < (double)1 / (double)n);
+			{
+				pher[i][j] = (double)1 / (double)n;
+			}
+		}
+	}
+}
+void upd_pger()
+{
+	int from, to;
+	for (int i = 0; i < num_ants; i++)
+	{
+		for (int k = 0; k < n; k++)
+		{
+			from = anst[i].way[k];
+			to = anst[i].way[(k + 1)%n];
+			pher[from][to] += (double)pherom_const / (double)anst[i].way_length;
+		}
+	}
+}
+void is_new_best()
+{
+	for (int i = 0; i < num_ants; i++)
+	{
+		if (anst[i].way_length < best.way_length)
+		{
+			best = anst[i];
+		}
+	}
+}
+int main()
+{
+	freopen("input.txt", "r", stdin);
+	freopen("output.txt", "w", stdout);
+	ios::sync_with_stdio(0); cin.tie(0); cout.tie(0);
+	srand(time(NULL));
+	best.way_length = INT_MAX;
+	cin >> n;
+	int *x = new int[n];
+	int *y = new int[n];
+	for (int i = 0; i < n; i++)
+		cin >> x[i] >> y[i];
+	pher = new double*[n];
+	w = new double*[n];
+	for (int i = 0; i < n; i++)
+	{
+		w[i] = new double[n];
+		pher[i] = new double[n];
+		for (int j = 0; j < n; j++)
+		{
+			w[i][j] = sqrt(pow(x[i] - x[j], 2) + pow(y[i] - y[j], 2));
+			pher[i][j] = (double)1 / (double)n;
+		}
+	}
+	for (int i = 0; i < iters; i++)
+	{
+		init_anst();
+		for (int j = 0; j < n; j++)
+		{
+			if (!ants_move(j))
+			{
+				ev_pher();
+				upd_pger();
+				is_new_best();
+			}
+		}
+	}
+	
+	cout << best.way_length << endl;
+	for (int i = 0; i < n; i++)
+		cout << best.way[i]+1 << ' ';
+		
+	//решил с Олегом Лазаревым
+}

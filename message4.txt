@@ -1,0 +1,158 @@
+#include <iostream>
+#include <cmath>
+#include <vector>
+#include <queue>  
+#include <string>
+#include <cfloat>
+#include <ctime>
+#include <algorithm>
+
+using namespace std;
+
+double fRand(double min, double max)
+{
+	return (double)(rand()) / RAND_MAX * (max - min) + min;
+}
+
+struct point
+{
+	double x, y;
+	int num;
+};
+
+struct ant
+{
+	vector<point> way;
+	vector<bool> is_vis;
+	double way_cost;
+
+	ant(int n)
+	{
+		way_cost = 0;
+		vector<bool> v(n, false);
+		is_vis = v;
+	}
+
+	void add(point a, vector<vector<double>> &cost)
+	{
+		is_vis[a.num] = true;
+		if (!way.empty())
+			way_cost += cost[way.back().num][a.num];
+		way.push_back(a);
+
+		if (way.size() == is_vis.size()) way_cost += cost[way.back().num][way[0].num];
+	}
+};
+
+double STLpowdontworkwtf(double a, int b)
+{
+	double res = 1;
+	for (int i = 0; i < b; i++)
+		res *= a;
+	return a;
+}
+
+int main()
+{
+	freopen("input.txt", "r", stdin);
+	freopen("output.txt", "w", stdout);
+
+	srand(time(NULL));
+
+	int n;
+	cin >> n;
+
+	vector<point> o(n);
+	vector<vector<double>> cost(n, vector<double>(n, DBL_MAX));
+	vector<vector<double>> pher(n, vector<double>(n, 1));
+
+	double A = 1, B = 1, RHO = 0.5;
+
+	vector<point> bestW;
+	double bestC = DBL_MAX;
+
+	for (int i = 0; i < n; i++)
+	{
+		cin >> o[i].x >> o[i].y;
+		o[i].num = i;
+	}
+
+	for (int i = 0; i<n; i++)
+	{
+		for (int j = 0; j < n; j++)
+		{
+			cost[i][j] = sqrt((o[i].x - o[j].x)*(o[i].x - o[j].x) + (o[i].y - o[j].y)*(o[i].y - o[j].y));
+		}
+	}
+
+	for (int t = 0; t < 100; t++) 
+	{
+		vector<ant> a(30, ant(n));
+		for (int i = 0; i < 30; i++)
+		{
+			int r = rand() % n;
+			a[i].add(o[r], cost);
+		}
+		for (int k = 0; k < 30; k++)
+		{
+			int next_city = 0;
+			while (a[k].way.size() != n)
+			{
+				if (!a[k].is_vis[next_city]) {
+					double probD = 0;
+
+					for (int i = 0; i < n; i++)
+					{
+						if (!a[k].is_vis[i]) {
+							probD += pow(pher[a[k].way.back().num][i], 1)*pow(1 / cost[a[k].way.back().num][i], 3);
+						}
+					}
+
+					double probN = pow(pher[a[k].way.back().num][next_city], 1)*pow(1 / cost[a[k].way.back().num][next_city], 3);
+
+					double P = probN / probD;
+					double r = fRand(0, 1);
+
+					if (r <= P) a[k].add(o[next_city], cost);
+				}
+				next_city++;
+				if (next_city == n) next_city = 0;
+			}
+
+			if (a[k].way_cost < bestC) 
+			{
+				bestW = a[k].way;
+				bestC = a[k].way_cost;
+			}
+		}
+
+		for (int i = 0; i < n; i++)
+		{
+			for (int j = 0; j < n; j++)
+			{
+				pher[i][j] *= (1 - RHO);
+
+				double idd = 1 / n;
+				if (pher[i][j] < idd) pher[i][j] = idd;
+			}
+		}
+
+		for (int i = 0; i < 30; i++)
+		{
+			for (int j = 0; j < n; j++)
+			{
+				int b = a[i].way[j].num;
+				int e = a[i].way[(j + 1) % n].num;
+
+				pher[b][e] += 1 / cost[b][e];
+				pher[e][b] = pher[b][e];
+			}
+		}
+	}
+
+	cout << bestC << endl;
+	for (int i = 0; i < n; i++)
+	{
+		cout << bestW[i].num + 1 << " ";
+	}
+}
